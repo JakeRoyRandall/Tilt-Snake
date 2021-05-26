@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { View } from 'react-native'
-import { Accelerometer, Gyroscope } from 'expo-sensors'
+import { Accelerometer } from 'expo-sensors'
 import Game from './Game'
 
 const App = () => {

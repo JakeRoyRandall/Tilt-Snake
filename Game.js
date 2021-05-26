@@ -6,6 +6,8 @@ import Snake from './Snake'
 import loop from './logic/loop'
 import { height, width } from './logic/constants'
 import { Accelerometer } from 'expo-sensors'
+import { mockMoveUp, mockMoveDown, mockMoveLeft, mockMoveRight, 
+         mockHitWall, mockHitSelf, mockHitFood } from './mock'
 
 const Game = (props) => {
     const gameEngine = useRef(null)
@@ -17,7 +19,7 @@ const Game = (props) => {
     const entities = () => {
         return {
             snake: { position: { x: (height / 2), y: (width / 2) }, dir: "Right", renderer: <Snake /> },
-            food: { position: { x: 0, y: 0 }, renderer: <Food /> }
+            food: { position: { x: undefined, y: undefined }, renderer: <Food /> }
         }
     }
     
@@ -43,27 +45,6 @@ const Game = (props) => {
         }
     }
 
-    const mockAccel = () => {
-        let rand = () => { return Math.random().toFixed(3)}
-        let mock = { x: rand(), y: rand() }
-        gameEngine.current.dispatch({type: "accel-data", detail: mock})
-    }
-
-    const mockHitWall = () => {
-        let rand = () => { return Math.random().toFixed(3)}
-        let mock = { x: rand(), y: rand() }
-        gameEngine.current.dispatch({type: "accel-data", detail: mock})
-    }
-
-    const mockHitSelf = () => {
-        gameEngine.current.dispatch({ type: "hit-self" })
-    }
-
-    const mockHitFood = () => {
-        gameEngine.current.dispatch({ type: "hit-food" })
-    }
-
-
     useEffect(() => {
         if (props.accelAvail) {
             Accelerometer.setUpdateInterval(16)
@@ -74,13 +55,6 @@ const Game = (props) => {
 
     return (
         <SafeAreaView style={{ backgroundColor: 'white' }}>
-            <Button onPress={() => resetGame()} title="Reset" />
-            <Button onPress={() => mockAccel()} title="Mock Accel" />
-            <Button onPress={() => mockHitWall()} title="Mock Hit-Wall" />
-            <Button onPress={() => mockHitSelf()} title="Mock Hit-Self" />
-            <Button onPress={() => mockHitFood()} title="Mock Hit-Food" />
-            <Text> { props.accelAvail ? 'true' : 'false' } </Text>
-            <Text> { score } </Text>
             <GameEngine 
                 style={{ height: '100%', width: '100%' }}
                 running = { true }
@@ -88,7 +62,18 @@ const Game = (props) => {
                 entities = { entities() }
                 systems = { [ loop ] }
                 onEvent={(e) => eventHandler(e)}
-            />
+            >
+            <Button onPress={() => resetGame()} title="Reset" />
+            <Button onPress={() => mockMoveUp(gameEngine)} title="UP" />
+            <Button onPress={() => mockMoveDown(gameEngine)} title="Down" />
+            <Button onPress={() => mockMoveLeft(gameEngine)} title="LEFT" />
+            <Button onPress={() => mockMoveRight(gameEngine)} title="RIGHT" />
+            {/* <Button onPress={() => mockHitWall(gameEngine)} title="Mock Hit-Wall" /> */}
+            {/* <Button onPress={() => mockHitSelf(gameEngine)} title="Mock Hit-Self" /> */}
+            {/* <Button onPress={() => mockHitFood(gameEngine)} title="Mock Hit-Food" /> */}
+            {/* <Text> { props.accelAvail ? 'true' : 'false' } </Text> */}
+            <Text> { score } </Text>
+            </GameEngine>
         </SafeAreaView>
       )
 }

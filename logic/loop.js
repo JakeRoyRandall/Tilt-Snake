@@ -1,6 +1,4 @@
 import { height, width } from './constants'
-import gameover from './gameover'
-import { Accelerometer } from 'expo-sensors'
 
 const randSq = () => {
     const top = Math.round( Math.random() * ( height - 40 ) )
@@ -9,9 +7,10 @@ const randSq = () => {
 }
 
 const getDir = (data) => {
-    if (data.y > 0 && data.y > data.x) return "UP"
-    if (data.y < 0 && data.x > data.y) return "DOWN"
-    if (data.y < 0 && data.y > data.x) return "LEFT"
+    console.log(data)
+    if (data.y > 0 && data.y > data.x) return "DOWN"
+    if (data.y < 0 && data.x > data.y) return "UP"
+    if (data.x < 0 && data.y > data.x) return "LEFT"
     if (data.x > 0 && data.x > data.y) return "RIGHT"
 }
 
@@ -35,22 +34,39 @@ const moveSnake = ( snake, dir, speed ) => {
 }
 
 const checkCollision = ( snake, food, dispatch ) => {
-    const { fx, fy } = food.position
+    const sx = snake.position.x
+    const sy = snake.position.y
+    const fx = food.position.x
+    const fy = food.position.y
+
     const hitWall = () => {
-        const hitTopWall = snake.position.x < 0
-        const hitBottomWall = snake.position.x > height
-        const hitLeftWall = snake.position.y < 0
-        const hitRightWall = snake.position.y > width
+        const hitTopWall = sx < 0
+        const hitBottomWall = sx > height - 20
+        const hitLeftWall = sy < 0
+        const hitRightWall = sy > width - 20
         if ( hitTopWall || hitBottomWall || hitLeftWall || hitRightWall ) return true
     }
+
+    const hitFood = () => {
+        const xDiff = () => {
+            if (sx > fx) return sx - fx - 5
+            else if (sx === fx) return sx - fx
+            else return fx - sx - 15
+        }
+        const yDiff = () => {
+            if (sy > fy) return sy - fy - 5
+            else if (sy === fy) return sy - fy
+            else return fy - sy  - 15
+        }
+        if ( xDiff() + yDiff() <= 0 ) {
+            food.position = randSq()
+            return true
+        }
+    }
+
     const hitSelf = () => {
         
     }
-    const hitFood = () => {
-        
-    }
-
-
 
     if (hitWall()) dispatch({ type: 'hit-wall'} )
     if (hitSelf()) dispatch({ type: 'hit-self'} )
@@ -59,10 +75,10 @@ const checkCollision = ( snake, food, dispatch ) => {
 
 const loop = ( entities, { dispatch, events } ) => {
     let { food, snake } = entities
-    if (food.position.x === 0) { food.position = randSq() }
+    if ( food.position.x === undefined ) { food.position = randSq() }
     if ( events.length && events[0].type === "accel-data"){
         let dir = getDir(events[0].detail)
-        let speed = 10
+        let speed = 2 
         snake = moveSnake(snake, dir, speed)
         checkCollision(snake, food, dispatch)
         return { food, snake }

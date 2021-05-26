@@ -5,8 +5,8 @@ const Food = (props) => {
     const styles = StyleSheet.create({
         square: {
             position: 'absolute',
-            height: 20,
-            width: 20,
+            height: 10,
+            width: 10,
             backgroundColor: 'pink',
             top: props.position.x,
             left: props.position.y
