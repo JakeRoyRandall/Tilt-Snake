@@ -1,21 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View } from 'react-native'
+import { Accelerometer, Gyroscope } from 'expo-sensors'
+import Game from './Game'
 
-export default function App() {
+const App = () => {
+  const [ ready, setReady ] = useState(true)
+  const [ accelAvail, setAccelAvail ] = useState(null)
+
+  useEffect(() => {
+    // Checks if the Accelerometer is avail (need to ask Mobile Web Users and set up alt for traditional Web)
+    Promise.resolve(Accelerometer.isAvailableAsync()).then((value) => setAccelAvail(value))
+  }, [])
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+    <View style={{ backgroundColor: 'black' }}>
+        { ready && <Game accelAvail={accelAvail} /> }
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App
